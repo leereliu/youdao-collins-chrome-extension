@@ -66,25 +66,29 @@ function getPosition(selection) {
   }
 
   const elem = range.startContainer.firstElementChild
-  if (elem !== undefined) {
-    if (elem.nodeName === 'INPUT' || elem.nodeName === 'TEXTAREA') {
-      const { top, left } = elem.getBoundingClientRect()
-      const rectStart = getCaretCoordinates(elem, elem.selectionStart)
-      const rectEnd = getCaretCoordinates(elem, elem.selectionEnd)
-      if (!rectEnd) {
-        return null
-      }
-      rect = {
-        top: top + rectEnd.top,
-        left: left + rectEnd.left,
-        width: rectEnd.left - rectStart.left,
-      }
+  if (elem && elem !== undefined && elem.nodeName && (elem.nodeName === 'INPUT' || elem.nodeName === 'TEXTAREA')) {
+    const { top, left } = elem.getBoundingClientRect()
+    const rectStart = getCaretCoordinates(elem, elem.selectionStart)
+    const rectEnd = getCaretCoordinates(elem, elem.selectionEnd)
+
+    if (!rectEnd) {
+      return null
+    }
+    rect = {
+      top: top + rectEnd.top,
+      left: left + rectEnd.left,
+      width: rectEnd.left - rectStart.left,
     }
   } else {
     rect = range.getBoundingClientRect()
   }
 
   const { top, left, width } = rect
+
+  if (!rect) {
+    return null
+  }
+
 
   return {
     left: left + window.pageXOffset + width / 2,

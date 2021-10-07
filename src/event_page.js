@@ -18,10 +18,11 @@ async function getWordExplain(body) {
 }
 
 async function getWords(word, sendRes) {
-  const url = getWordURL(word)
+  // because youdao dict cannot recognize search word `/`
+  const _word = word.replace(/\//g, "<&>")
+  const url = getWordURL(_word)
   const body = await fetch(url).then(res => res.text())
   const explain = await getWordExplain(body)
-
   sendRes(explain)
 }
 

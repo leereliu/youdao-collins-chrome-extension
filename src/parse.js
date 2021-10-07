@@ -295,7 +295,7 @@ function getMachineTranslation($): MachineTranslationResponseType {
   const $container = $('#ydTrans .trans-container p')
 
   return {
-    translation: $container.eq(1).text(),
+    translation: $container.eq(1).text().replace(/<&>/g, "/"),
   }
 }
 
