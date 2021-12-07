@@ -64,12 +64,21 @@ function getPosition(selection) {
   } catch (err) {
     return null
   }
-
+  // 存在一种情况，如 Google 搜索栏，selection 在 input 框，但是 range.startContainer
+  // 父节点中，input 元素并不是它的第一个元素，导致 elem 选择错误
+  // 暂时不知道解决办法
   const elem = range.startContainer.firstElementChild
+  // console.log("elem", elem);
+  // console.log("elem.nodeName", elem.nodeName);
   if (elem && elem !== undefined && elem.nodeName && (elem.nodeName === 'INPUT' || elem.nodeName === 'TEXTAREA')) {
     const { top, left } = elem.getBoundingClientRect()
+    // console.log("elem.getBoundingClientRect()", top, left)
+    // console.log("elem.selectionStart", elem.selectionStart)
+    // console.log("elem.selectionEnd", elem.selectionEnd)
     const rectStart = getCaretCoordinates(elem, elem.selectionStart)
     const rectEnd = getCaretCoordinates(elem, elem.selectionEnd)
+    // console.log("rectStart", rectStart)
+    // console.log("rectEnd", rectEnd)
 
     if (!rectEnd) {
       return null
@@ -81,6 +90,16 @@ function getPosition(selection) {
     }
   } else {
     rect = range.getBoundingClientRect()
+    // const { top, left , width} = (range || {}).getBoundingClientRect()
+    // if (top && left) {
+    //   rect = elem.getBoundingClientRect()
+    // } else {  
+    //   if (range.startContainer.nodeName === '#text') {
+    //     rect = range.startContainer.parentElement.getBoundingClientRect()
+    //   } else {
+    //     rect = range.startContainer.getBoundingClientRect()
+    //   }
+    // }
   }
 
   const { top, left, width } = rect

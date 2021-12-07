@@ -177,6 +177,7 @@ function renderWordBasic(
         {showNotebook ? (
           <span style={styles.infoItem}>
             <AddWord
+              key={word}
               word={word}
               showWordsPage={showWordsPage}
               flash={flash}
