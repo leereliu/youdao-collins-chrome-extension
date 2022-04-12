@@ -4,7 +4,11 @@ import icons from './icons'
 
 const { string } = PropTypes
 
-function getAudioURL(word, type = 1) {
+/**
+ * @param {String} word word
+ * @param {1,2} type 1 indicate british pronunciation 2 indicate america pronunciation
+ */
+function getAudioURL(word, type = 2) {
   return `https://dict.youdao.com/dictvoice?audio=${word}&type=${type}`
 }
 

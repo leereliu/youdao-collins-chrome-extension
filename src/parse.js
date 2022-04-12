@@ -100,14 +100,14 @@ function getFrequency(className) {
 function getInfo($container) {
   const word = $container.find('.title').text()
   const $star = $container.find('.star')
-  const pronunciation = $container.find('.spell').text()
+  // const pronunciation = $container.find('.spell').text()
   const frequence = $star.length > 0 ? getFrequency($star.attr('class')) : null
   const rank = $container.find('.rank').text()
   const additionalPattern = $container.find('.pattern').text().trim()
 
   return {
     word,
-    pronunciation,
+    // pronunciation,
     frequence,
     rank,
     additionalPattern,
@@ -237,12 +237,15 @@ function getSynonyms($) {
 function getExplainResponse($): ExplainResponseType {
   const $collinsContainer = $('.collinsToggle')
 
+  const $title = $('.wordbook-js')
+  const pronunciation = $title.find('.pronounce .phonetic').eq(1).text().trim()
+
   const {
     meanings,
   } = getMeanings($, $collinsContainer.find('li'))
 
   return {
-    wordInfo: getInfo($collinsContainer.find('h4').eq(0)),
+    wordInfo: Object.assign({}, getInfo($collinsContainer.find('h4').eq(0)), { pronunciation }),
     synonyms: getSynonyms($collinsContainer),
     meanings,
   }
@@ -251,7 +254,7 @@ function getExplainResponse($): ExplainResponseType {
 function getTitleInfo($): WordInfoType {
   const $title = $('.wordbook-js')
   const word = $title.find('.keyword').text().trim()
-  const pronunciation = $title.find('.pronounce .phonetic').eq(0).text().trim()
+  const pronunciation = $title.find('.pronounce .phonetic').eq(1).text().trim()
 
   return {
     word,
