@@ -321,6 +321,8 @@ interface WordBasicProps {
   search?: (word: string) => void
   showNotebook: boolean
   onAddWord: (word: string) => Promise<{ success: boolean; msg?: string }>
+  canGoBack?: boolean
+  onBack?: () => void
 }
 
 function WordBasic({
@@ -328,7 +330,9 @@ function WordBasic({
   synonyms,
   search,
   showNotebook,
-  onAddWord
+  onAddWord,
+  canGoBack = false,
+  onBack
 }: WordBasicProps) {
   const { word, pronunciation, frequence, rank, additionalPattern } = wordInfo
 
@@ -354,6 +358,31 @@ function WordBasic({
   return (
     <div style={STYLES.info}>
       <div>
+        {canGoBack && onBack && (
+          <span
+            style={{
+              ...STYLES.infoItem,
+              cursor: "pointer",
+              color: COLORS.primary,
+              marginRight: 8
+            }}
+            onClick={onBack}
+            title="返回上一个"
+          >
+            <svg
+              style={{
+                width: 16,
+                height: 16,
+                display: "inline-block",
+                verticalAlign: "middle"
+              }}
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+            </svg>
+          </span>
+        )}
         <span
           style={{ ...STYLES.infoItem, color: COLORS.danger, fontWeight: 600 }}
         >
@@ -442,6 +471,10 @@ interface WordDetailProps {
   onAddWord: (word: string) => Promise<{ success: boolean; msg?: string }>
   /** 是否显示生词本功能 */
   showNotebook?: boolean
+  /** 搜索历史 */
+  searchHistory?: Array<{ word: string; result: WordResponse }>
+  /** 返回上一个搜索 */
+  onBack?: () => void
 }
 
 export function WordDetail({
@@ -451,9 +484,12 @@ export function WordDetail({
   onSearch,
   onOpenLink,
   onAddWord,
-  showNotebook = true
+  showNotebook = true,
+  searchHistory = [],
+  onBack
 }: WordDetailProps) {
   const handleOpenYoudao = () => onOpenLink(currentWord)
+  const canGoBack = searchHistory.length > 1
 
   if (loading) {
     return <div>正在加载 "{currentWord}" ...</div>
@@ -646,6 +682,8 @@ export function WordDetail({
           search={onSearch}
           showNotebook={showNotebook}
           onAddWord={onAddWord}
+          canGoBack={canGoBack}
+          onBack={onBack}
         />
         {meanings.map((meaning, index) => (
           <MeaningItem key={index} meaning={meaning} onSearch={onSearch} />
@@ -664,6 +702,8 @@ export function WordDetail({
             wordInfo={wordInfo}
             showNotebook={showNotebook}
             onAddWord={onAddWord}
+            canGoBack={canGoBack}
+            onBack={onBack}
           />
         )}
         {explains.map((item, index) => (

@@ -133,7 +133,16 @@ function Searcher({ onSearch, history, onJumpBack }: SearcherProps) {
 
 // ============ 主 Popup 组件 ============
 
-function shouldPush(history: WordResponse[], newItem: WordResponse): boolean {
+interface SearchHistoryItem {
+  word: string
+  result: WordResponse
+}
+
+function shouldPush(
+  history: SearchHistoryItem[],
+  newWord: string,
+  newItem: WordResponse
+): boolean {
   if (!Array.isArray(history) || history.length < 1) {
     return true
   }
@@ -141,15 +150,15 @@ function shouldPush(history: WordResponse[], newItem: WordResponse): boolean {
   const lastItem = history[history.length - 1]
 
   return !(
-    lastItem.type === "explain" &&
+    lastItem.result.type === "explain" &&
     newItem.type === "explain" &&
-    lastItem.response.wordInfo.word === newItem.response.wordInfo.word
+    lastItem.result.response.wordInfo.word === newItem.response.wordInfo.word
   )
 }
 
 function IndexPopup() {
   const [explain, setExplain] = useState<WordResponse | null>(null)
-  const [history, setHistory] = useState<WordResponse[]>([])
+  const [history, setHistory] = useState<SearchHistoryItem[]>([])
   const [currentWord, setCurrentWord] = useState("")
   const currentWordRef = useRef("")
 
@@ -215,9 +224,14 @@ function IndexPopup() {
   }, [])
 
   const jumpBack = () => {
-    const newHistory = history.slice(0, history.length - 1)
-    setExplain(newHistory[newHistory.length - 1] || null)
+    if (history.length <= 1) return
+
+    const newHistory = history.slice(0, -1)
+    const previous = newHistory[newHistory.length - 1]
+
     setHistory(newHistory)
+    setCurrentWord(previous.word)
+    setExplain(previous.result)
   }
 
   const search = async (word: string) => {
@@ -225,11 +239,11 @@ function IndexPopup() {
 
     try {
       const res = await searchWord(word)
-      const push = shouldPush(history, res)
+      const push = shouldPush(history, word, res)
 
       let newHistory = history
       if (push) {
-        newHistory = [...history, res]
+        newHistory = [...history, { word, result: res }]
       }
 
       setCurrentWord(word)
@@ -265,6 +279,8 @@ function IndexPopup() {
             onOpenLink={handleOpenLink}
             onAddWord={handleAddWord}
             showNotebook
+            searchHistory={history}
+            onBack={history.length > 1 ? jumpBack : undefined}
           />
         </div>
       ) : (

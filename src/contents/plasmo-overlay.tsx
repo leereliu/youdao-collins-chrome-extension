@@ -116,6 +116,9 @@ function TranslatorOverlay() {
   const [loading, setLoading] = useState(false)
   const [currentWord, setCurrentWord] = useState("")
   const [options, setOptionsState] = useState<Options | null>(null)
+  const [searchHistory, setSearchHistory] = useState<
+    Array<{ word: string; result: WordResponse }>
+  >([])
   const lastWordRef = useRef("")
   const justOpenedRef = useRef(false)
   const currentWordRef = useRef("")
@@ -197,7 +200,7 @@ function TranslatorOverlay() {
   }, [])
 
   // 搜索单词
-  const search = async (word: string) => {
+  const search = async (word: string, skipHistory = false) => {
     if (!word || word === lastWordRef.current) return
     lastWordRef.current = word
 
@@ -209,6 +212,11 @@ function TranslatorOverlay() {
       const response = await searchWord(word)
       if (word === lastWordRef.current) {
         setResult(response)
+        
+        // 添加到历史记录（跳过返回操作）
+        if (!skipHistory) {
+          setSearchHistory((prev) => [...prev, { word, result: response }])
+        }
       }
     } catch {
       if (word === lastWordRef.current) {
@@ -219,6 +227,20 @@ function TranslatorOverlay() {
         setLoading(false)
       }
     }
+  }
+
+  // 返回上一个搜索
+  const handleBack = () => {
+    if (searchHistory.length <= 1) return
+
+    // 移除当前记录
+    const newHistory = searchHistory.slice(0, -1)
+    const previous = newHistory[newHistory.length - 1]
+
+    setSearchHistory(newHistory)
+    setCurrentWord(previous.word)
+    setResult(previous.result)
+    lastWordRef.current = previous.word
   }
 
   // 处理添加单词到扇贝
@@ -281,6 +303,7 @@ function TranslatorOverlay() {
 
       justOpenedRef.current = true
       setVisible(true)
+      setSearchHistory([]) // 重置历史记录
       search(selectedText.toLowerCase())
 
       setTimeout(() => {
@@ -335,6 +358,7 @@ function TranslatorOverlay() {
       if (!target.closest("[data-yc-popup]")) {
         setVisible(false)
         lastWordRef.current = ""
+        setSearchHistory([]) // 清空历史记录
       }
     }
 
@@ -371,6 +395,8 @@ function TranslatorOverlay() {
           onOpenLink={handleOpenLink}
           onAddWord={handleAddWord}
           showNotebook={options?.showNotebook ?? true}
+          searchHistory={searchHistory}
+          onBack={handleBack}
         />
       </PopupContainer>
     </div>

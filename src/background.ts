@@ -218,7 +218,7 @@ async function getWords(
     sendRes(explain)
   } catch (error) {
     console.error("Failed to fetch word:", error)
-    
+
     // 如果有道翻译失败，但 AI 翻译已启动，返回错误提示 + AI 翻译
     if (aiTranslationStarted) {
       sendRes({
