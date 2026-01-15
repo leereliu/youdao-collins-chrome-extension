@@ -163,49 +163,56 @@ async function getWords(
   word: string,
   sendRes: (response: ExplainResponseWithAdded) => void
 ): Promise<void> {
-  // 先使用有道翻译（单词、短语、长文本都走有道）
-  let _word = word.replace(/\//g, "<&>")
-  _word = _word.replace(/%/g, "<$>")
+  // 判断是否为长文本且配置了 API Key
+  const isLongText = shouldUseLLM(word)
+  let aiTranslationStarted = false
+
+  if (isLongText) {
+    // 并行：立即检查配置并启动 AI 翻译（不等待有道结果）
+    const options = await getOptions()
+    const apiKey = options.aiApiKey?.trim()
+
+    if (apiKey) {
+      // 立即启动 AI 翻译
+      startStreamingTranslation(word, apiKey)
+      aiTranslationStarted = true
+    }
+  }
+
+  // 并行：同时获取有道翻译
+  const _word = word.replace(/\//g, "<&>").replace(/%/g, "<$>")
   const url = getWordURL(_word)
 
   try {
     const response = await fetch(url)
     const body = await response.text()
     const explain = await getWordExplain(body)
-    
-    // 判断是否启用 AI 增强翻译
-    if (shouldUseLLM(word)) {
-      const options = await getOptions()
-      const apiKey = options.aiApiKey?.trim()
-      
-      if (apiKey) {
-        // 配置了 API Key，返回双重翻译
-        let machineTranslation = ""
-        
-        if (explain.type === "machine_translation") {
-          machineTranslation = explain.response.translation
-        } else if (explain.type === "non_collins_explain") {
-          machineTranslation = explain.response.explains
-            .map((e) => e.explain)
-            .join("；")
-        }
-        
-        if (machineTranslation) {
-          sendRes({
-            type: "llm_translation",
-            response: {
-              machineTranslation,
-              aiTranslation: "",
-              isStreaming: true
-            }
-          })
-          // 异步启动 AI 翻译
-          startStreamingTranslation(word, apiKey)
-          return
-        }
+
+    // 如果启动了 AI 翻译，返回双重翻译格式
+    if (aiTranslationStarted) {
+      let machineTranslation = ""
+
+      if (explain.type === "machine_translation") {
+        machineTranslation = explain.response.translation
+      } else if (explain.type === "non_collins_explain") {
+        machineTranslation = explain.response.explains
+          .map((e) => e.explain)
+          .join("；")
+      }
+
+      if (machineTranslation) {
+        sendRes({
+          type: "llm_translation",
+          response: {
+            machineTranslation,
+            aiTranslation: "",
+            isStreaming: true
+          }
+        })
+        return
       }
     }
-    
+
     // 没有配置 API Key 或不是长文本，直接返回有道结果
     sendRes(explain)
   } catch (error) {
