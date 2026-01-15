@@ -3,17 +3,8 @@
  * 共用的单词详情展示组件，用于 popup 和 content script overlay
  */
 
-import { useState, useRef, useCallback, useEffect } from "react"
-import type {
-  WordResponse,
-  ExplainResponse,
-  ChoiceResponse,
-  NonCollinsExplainsResponse,
-  MachineTranslationResponse,
-  Synonyms,
-  WordInfo,
-  Meaning
-} from "../lib/types"
+import { useState, useRef, useCallback } from "react"
+import type { WordResponse, Synonyms, WordInfo, Meaning } from "../lib/types"
 
 // ============ 样式常量 ============
 

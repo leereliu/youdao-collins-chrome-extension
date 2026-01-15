@@ -23,7 +23,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit --noUnusedLocals"
   },
   "dependencies": {
     "cheerio": "^1.0.0",
