@@ -1,0 +1,16 @@
+---
+description: 项目技术栈与构建工具规范
+globs: package.json, vite.config.ts, plasmo.config.ts
+alwaysApply: true
+---
+
+# 技术栈规范
+
+- **Framework**: 使用 Plasmo Framework (首选) 或 Vite + CRXJS。
+- **React**: 强制升级到 React 19。
+- **Language**: 强制使用 TypeScript。
+- **Style**: 使用 Tailwind CSS。
+
+# 迁移原则
+
+- 遇到 Webpack 配置时，彻底废弃，不要尝试修复旧的 webpack.config.js，直接使用新框架的零配置能力。

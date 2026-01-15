@@ -1,0 +1,21 @@
+---
+description: Chrome Extension Manifest V3 迁移专用规则，涉及 background 和权限时触发
+globs: src/background/**/*, manifest.json
+alwaysApply: false
+---
+
+# Manifest V3 核心约束
+
+1. **No Background Pages**: 必须使用 Service Workers。
+
+   - 严禁在 background script 中使用 `window` 或 `document` 对象。
+   - 如果需要 DOM 解析，必须使用 `Offscreen API`。
+
+2. **Network Requests**:
+
+   - 废弃 `webRequest.onBeforeRequest` (阻塞式)。
+   - 必须使用 `declarativeNetRequest` API 进行规则拦截。
+
+3. **Timer**:
+   - Service Worker 会休眠。严禁依赖 `setTimeout` 或 `setInterval` 维持状态。
+   - 使用 `chrome.alarms` API 代替定时器。

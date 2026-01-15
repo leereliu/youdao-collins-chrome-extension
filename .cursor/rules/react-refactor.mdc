@@ -1,0 +1,20 @@
+---
+description: 将旧版 React 转换为现代 React 代码
+globs: src/**/*.tsx, src/**/*.jsx
+alwaysApply: false
+---
+
+# React 重构指南 (v16 -> v19)
+
+1. **No Class Components**:
+
+   - 将所有 `class extends React.Component` 重写为 Functional Components。
+   - 将 `this.state` 转换为 `useState` 或 `useReducer`。
+   - 将 `componentDidMount/Update` 转换为 `useEffect`。
+
+2. **State Management**:
+
+   - 废弃 Redux (旧版 boilerplate)，推荐使用 Zustand 或 React Context。
+
+3. **Strict Mode**:
+   - 确保组件在 `React.StrictMode` 下无报错。
