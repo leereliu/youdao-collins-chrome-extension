@@ -118,16 +118,77 @@ function TranslatorOverlay() {
   const [options, setOptionsState] = useState<Options | null>(null)
   const lastWordRef = useRef("")
   const justOpenedRef = useRef(false)
+  const currentWordRef = useRef("")
 
-  // 加载选项
+  // 同步 currentWord 到 ref
+  useEffect(() => {
+    currentWordRef.current = currentWord
+  }, [currentWord])
+
+  // 加载选项 + 监听流式翻译消息
   useEffect(() => {
     getOptions().then(setOptionsState)
 
-    const handleMessage = (message: { type: string; tempDisabled?: boolean }) => {
+    const handleMessage = (message: {
+      eventName?: string
+      type?: string
+      tempDisabled?: boolean
+      data?: { text: string; chunk: string; done: boolean; error?: string }
+    }) => {
+      // 处理选项更新
       if (message.type === "ycce" && typeof message.tempDisabled === "boolean") {
         setOptionsState((prev) =>
           prev ? { ...prev, tempDisabled: message.tempDisabled! } : prev
         )
+        return
+      }
+
+      // 处理流式翻译
+      if (message.eventName === "LLM_TRANSLATION_STREAM" && message.data) {
+        const { text, chunk, done, error } = message.data
+
+        // 只处理当前正在翻译的文本（不区分大小写）
+        if (
+          !currentWordRef.current ||
+          text.toLowerCase() !== currentWordRef.current.toLowerCase()
+        ) {
+          return
+        }
+
+        if (error) {
+          console.error("Streaming error:", error)
+          return
+        }
+
+        if (done) {
+          // 流式完成
+          setResult((prev) => {
+            if (prev?.type === "llm_translation") {
+              return {
+                ...prev,
+                response: {
+                  ...prev.response,
+                  isStreaming: false
+                }
+              }
+            }
+            return prev
+          })
+        } else {
+          // 实时更新 AI 翻译
+          setResult((prev) => {
+            if (prev?.type === "llm_translation") {
+              return {
+                ...prev,
+                response: {
+                  ...prev.response,
+                  aiTranslation: prev.response.aiTranslation + chunk
+                }
+              }
+            }
+            return prev
+          })
+        }
       }
     }
 

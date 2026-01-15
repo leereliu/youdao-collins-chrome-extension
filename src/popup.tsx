@@ -151,6 +151,68 @@ function IndexPopup() {
   const [explain, setExplain] = useState<WordResponse | null>(null)
   const [history, setHistory] = useState<WordResponse[]>([])
   const [currentWord, setCurrentWord] = useState("")
+  const currentWordRef = useRef("")
+
+  // 同步 currentWord 到 ref
+  useEffect(() => {
+    currentWordRef.current = currentWord
+  }, [currentWord])
+
+  // 监听流式翻译消息
+  useEffect(() => {
+    const handleMessage = (message: {
+      eventName?: string
+      data?: { text: string; chunk: string; done: boolean; error?: string }
+    }) => {
+      // 处理流式翻译
+      if (message.eventName === "LLM_TRANSLATION_STREAM" && message.data) {
+        const { text, chunk, done, error } = message.data
+
+        // 只处理当前正在翻译的文本
+        if (text.toLowerCase() !== currentWordRef.current.toLowerCase()) {
+          return
+        }
+
+        if (error) {
+          console.error("Streaming error:", error)
+          return
+        }
+
+        if (done) {
+          // 流式完成
+          setExplain((prev) => {
+            if (prev?.type === "llm_translation") {
+              return {
+                ...prev,
+                response: {
+                  ...prev.response,
+                  isStreaming: false
+                }
+              }
+            }
+            return prev
+          })
+        } else {
+          // 实时更新结果
+          setExplain((prev) => {
+            if (prev?.type === "llm_translation") {
+              return {
+                ...prev,
+                response: {
+                  ...prev.response,
+                  aiTranslation: prev.response.aiTranslation + chunk
+                }
+              }
+            }
+            return prev
+          })
+        }
+      }
+    }
+
+    chrome.runtime.onMessage.addListener(handleMessage)
+    return () => chrome.runtime.onMessage.removeListener(handleMessage)
+  }, [])
 
   const jumpBack = () => {
     const newHistory = history.slice(0, history.length - 1)

@@ -67,12 +67,19 @@ export interface MachineTranslationResponse {
   translation: string
 }
 
+export interface LLMTranslationResponse {
+  machineTranslation: string  // 有道机翻（快速显示）
+  aiTranslation: string        // AI 翻译（流式输出）
+  isStreaming?: boolean        // 是否正在流式输出
+}
+
 export type ResponseType =
   | "explain"
   | "choices"
   | "error"
   | "non_collins_explain"
   | "machine_translation"
+  | "llm_translation"
 
 export type WordResponse =
   | { type: "explain"; response: ExplainResponse }
@@ -80,6 +87,7 @@ export type WordResponse =
   | { type: "error" }
   | { type: "non_collins_explain"; response: NonCollinsExplainsResponse }
   | { type: "machine_translation"; response: MachineTranslationResponse }
+  | { type: "llm_translation"; response: LLMTranslationResponse }
 
 // ============ 工具函数 ============
 

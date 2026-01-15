@@ -502,6 +502,116 @@ export function WordDetail({
     )
   }
 
+  // llm_translation
+  if (result.type === "llm_translation") {
+    const { machineTranslation, aiTranslation, isStreaming } = result.response
+
+    return (
+      <div>
+        {/* 有道机翻部分 - 始终显示 */}
+        <div style={{ marginBottom: 16 }}>
+          <div
+            style={{
+              fontSize: 12,
+              color: COLORS.muted,
+              marginBottom: 6
+            }}
+          >
+            有道翻译
+          </div>
+          <div
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: 4,
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "#555"
+            }}
+          >
+            {machineTranslation}
+          </div>
+        </div>
+
+        {/* AI 翻译部分 */}
+        <div>
+          <div
+            style={{
+              marginBottom: 8,
+              fontSize: 12,
+              color: COLORS.muted,
+              display: "flex",
+              alignItems: "center"
+            }}
+          >
+            <svg
+              style={{ width: 14, height: 14, marginRight: 4 }}
+              viewBox="0 0 24 24"
+              fill={COLORS.primary}
+            >
+              <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" />
+            </svg>
+            <span>AI 翻译</span>
+            {isStreaming && (
+              <span
+                style={{
+                  marginLeft: 6,
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  backgroundColor: COLORS.primary,
+                  display: "inline-block",
+                  animation: "pulse 1.5s ease-in-out infinite"
+                }}
+              />
+            )}
+          </div>
+          <div
+            style={{
+              padding: "8px 12px",
+              backgroundColor: COLORS.mainBG,
+              borderRadius: 4,
+              fontSize: 14,
+              lineHeight: 1.8,
+              minHeight: aiTranslation ? "auto" : 50,
+              position: "relative"
+            }}
+          >
+            {aiTranslation || (
+              <span style={{ color: COLORS.muted, fontSize: 13 }}>
+                {isStreaming ? "AI 正在翻译..." : "等待翻译"}
+              </span>
+            )}
+            {isStreaming && aiTranslation && (
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 2,
+                  height: 16,
+                  backgroundColor: COLORS.primary,
+                  marginLeft: 2,
+                  verticalAlign: "middle",
+                  animation: "blink 1s step-start infinite"
+                }}
+              />
+            )}
+          </div>
+        </div>
+
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+          }
+          @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+          }
+        `}</style>
+      </div>
+    )
+  }
+
   // explain
   if (result.type === "explain") {
     const { wordInfo, meanings, synonyms } = result.response

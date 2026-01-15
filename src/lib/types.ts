@@ -15,6 +15,7 @@ export type {
   NonCollinsExplain,
   NonCollinsExplainsResponse,
   MachineTranslationResponse,
+  LLMTranslationResponse,
   ResponseType,
   WordResponse,
 } from "./parser"
@@ -26,6 +27,7 @@ export const EVENTS = {
   OPEN_NEW_TAB: "OPEN_NEW_TAB",
   ADD_WORD_SHANBAY: "ADD_WORD_SHANBAY",
   CLEAR_SHANBAY_TOKEN: "CLEAR_SHANBAY_TOKEN",
+  LLM_TRANSLATION_STREAM: "LLM_TRANSLATION_STREAM", // 流式翻译事件
 } as const
 
 export type EventName = (typeof EVENTS)[keyof typeof EVENTS]
@@ -49,6 +51,7 @@ export interface Options {
   showNotebook: boolean
   tempDisabled: boolean
   showContainChinese?: boolean
+  aiApiKey?: string  // OpenRouter API Key
 }
 
 export const ACTIVE_TYPES: Record<ActiveType, string> = {
@@ -63,6 +66,7 @@ export const DEFAULT_OPTIONS: Options = {
   showNotebook: true,
   tempDisabled: false,
   showContainChinese: false,
+  aiApiKey: "", // 用户需要在设置页面配置
 }
 
 // ============ 扇贝 API 类型 ============

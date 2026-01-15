@@ -54,13 +54,64 @@ function OptionsApp() {
     )
   }
 
-  const { activeType, showContainChinese } = options
+  const { activeType, showContainChinese, aiApiKey } = options
 
   return (
     <div className="mx-auto max-w-xl p-6 text-sm">
       <h1 className="mb-6 text-2xl font-bold text-gray-800">
         划词翻译(柯林斯词典) 设置
       </h1>
+
+      {/* AI 翻译设置 */}
+      <section className="mb-6 rounded-lg border border-gray-200 p-4">
+        <div className="mb-3 flex items-start justify-between">
+          <h2 className="font-semibold text-gray-700">AI 增强翻译</h2>
+          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+            可选功能
+          </span>
+        </div>
+        <div className="space-y-3">
+          <div className="rounded bg-blue-50 p-3 text-xs text-blue-800">
+            <p className="mb-1 font-medium">✨ 配置后可获得：</p>
+            <ul className="ml-4 list-disc space-y-0.5">
+              <li>长文本 AI 流式翻译（逐字显示，更自然）</li>
+              <li>更准确的上下文理解</li>
+              <li>保留有道机翻作为对比参考</li>
+            </ul>
+            <p className="mt-2 text-gray-600">
+              💡 不配置则所有文本都使用有道翻译
+            </p>
+          </div>
+          <label className="block">
+            <span className="mb-1 block text-sm text-gray-700">
+              OpenRouter API Key (可选)
+            </span>
+            <input
+              type="password"
+              placeholder="留空则仅使用有道翻译"
+              value={aiApiKey || ""}
+              onChange={(e) => changeOptions("aiApiKey", e.target.value)}
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+            />
+          </label>
+          <div className="space-y-1 text-xs text-gray-600">
+            <p>
+              获取免费 API Key：
+              <a
+                href="https://openrouter.ai/keys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-1 text-blue-600 hover:underline"
+              >
+                openrouter.ai/keys
+              </a>
+            </p>
+            <p className="text-gray-500">
+              推荐模型：xiaomi/mimo-v2-flash:free (完全免费)
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* 扇贝设置 */}
       <section className="mb-6 rounded-lg border border-gray-200 p-4">

@@ -1,7 +1,7 @@
 {
   "name": "youdao-collins-chrome-extension",
   "displayName": "划词翻译(柯林斯词典)+扇贝生词本",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
@@ -58,7 +58,8 @@
       "https://dict.youdao.com/*",
       "https://api.shanbay.com/*",
       "https://apiv3.shanbay.com/*",
-      "https://web.shanbay.com/*"
+      "https://web.shanbay.com/*",
+      "https://openrouter.ai/*"
     ],
     "commands": {
       "_execute_action": {

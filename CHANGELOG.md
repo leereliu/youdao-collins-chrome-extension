@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## v2.1.0
+
+### 新增
+- **AI 增强翻译**（可选）：配置 API Key 后，长文本获得双重翻译
+  - 有道机翻：快速显示基础翻译
+  - AI 流式翻译：实时逐字显示更准确的翻译
+- **智能文本判断**：自动识别单词/短语和长文本
+- **API Key 配置**：支持在设置页面自定义 OpenRouter API Key
+- 支持 Popup 和划词两种场景的流式翻译
+
+### 改进
+- 有道翻译作为默认，AI 翻译作为可选增强功能
+- 未配置 API Key 时，所有文本使用有道翻译，不影响使用
+- 配置 API Key 后，长文本同时显示有道和 AI 两种翻译
+- 优化翻译 UI，添加流式状态指示和动画效果
+- 优化消息通信机制，支持 Popup 和 Content Script 同时接收流式数据
+- API Key 存储在本地，更安全
+
+### 使用说明
+- 💡 不配置 API Key：所有文本使用有道翻译（默认行为）
+- ✨ 配置 API Key：长文本获得有道 + AI 双重翻译
+- 🆓 推荐免费模型：xiaomi/mimo-v2-flash:free
+- 🔗 获取 API Key：https://openrouter.ai/keys
+
+### 技术细节
+- 集成 OpenRouter AI API (Xiaomi Mimo V2 Flash)
+- 使用 Server-Sent Events (SSE) 实现流式传输
+- 优化 React 状态管理，避免闭包陷阱
+- API Key 配置化，支持用户自定义
+- 智能降级：未配置 API Key 时自动使用有道翻译
+
+---
+
 ## v2.0.2
 
 ### 新增
