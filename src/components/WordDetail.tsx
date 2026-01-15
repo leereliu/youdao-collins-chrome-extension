@@ -248,9 +248,10 @@ function extractWordFromLink(href: string): string | null {
 interface ClickableContentProps {
   html: string
   onSearch: (word: string) => void
+  loadingWord?: string | null
 }
 
-function ClickableContent({ html, onSearch }: ClickableContentProps) {
+function ClickableContent({ html, onSearch, loadingWord }: ClickableContentProps) {
   // 解析 HTML，提取链接并替换为可点击元素
   const parts: Array<{
     type: "text" | "link"
@@ -299,16 +300,52 @@ function ClickableContent({ html, onSearch }: ClickableContentProps) {
             />
           )
         }
+        const isLoading = loadingWord && part.word === loadingWord
         return (
-          <span
-            key={index}
-            style={{ color: COLORS.primary, cursor: "pointer" }}
-            onClick={() => part.word && onSearch(part.word)}
-          >
-            {part.content}
+          <span key={index}>
+            <span
+              style={{
+                color: COLORS.primary,
+                cursor: isLoading ? "wait" : "pointer",
+                opacity: isLoading ? 0.6 : 1
+              }}
+              onClick={() => !isLoading && part.word && onSearch(part.word)}
+            >
+              {part.content}
+            </span>
+            {isLoading && (
+              <span
+                style={{
+                  marginLeft: 4,
+                  display: "inline-block",
+                  animation: "spin 1s linear infinite"
+                }}
+              >
+                <svg
+                  style={{ width: 12, height: 12, verticalAlign: "middle" }}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke={COLORS.primary}
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray="31.4 31.4"
+                  />
+                </svg>
+              </span>
+            )}
           </span>
         )
       })}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </span>
   )
 }
@@ -431,9 +468,10 @@ function WordBasic({
 interface MeaningItemProps {
   meaning: Meaning
   onSearch: (word: string) => void
+  loadingWord?: string | null
 }
 
-function MeaningItem({ meaning, onSearch }: MeaningItemProps) {
+function MeaningItem({ meaning, onSearch, loadingWord }: MeaningItemProps) {
   const {
     example: { eng, ch },
     explain: { type, typeDesc, engExplain }
@@ -444,7 +482,11 @@ function MeaningItem({ meaning, onSearch }: MeaningItemProps) {
       <div style={STYLES.explain}>
         <span style={STYLES.wordType}>{type}</span>
         <span style={{ ...STYLES.wordType, marginRight: 10 }}>{typeDesc}</span>
-        <ClickableContent html={engExplain} onSearch={onSearch} />
+        <ClickableContent
+          html={engExplain}
+          onSearch={onSearch}
+          loadingWord={loadingWord}
+        />
       </div>
       <div style={STYLES.exampleItem}>
         <div>{eng}</div>
@@ -475,6 +517,8 @@ interface WordDetailProps {
   searchHistory?: Array<{ word: string; result: WordResponse }>
   /** 返回上一个搜索 */
   onBack?: () => void
+  /** 正在加载的单词（点击链接时） */
+  loadingWord?: string | null
 }
 
 export function WordDetail({
@@ -486,7 +530,8 @@ export function WordDetail({
   onAddWord,
   showNotebook = true,
   searchHistory = [],
-  onBack
+  onBack,
+  loadingWord = null
 }: WordDetailProps) {
   const handleOpenYoudao = () => onOpenLink(currentWord)
   const canGoBack = searchHistory.length > 1
@@ -686,7 +731,12 @@ export function WordDetail({
           onBack={onBack}
         />
         {meanings.map((meaning, index) => (
-          <MeaningItem key={index} meaning={meaning} onSearch={onSearch} />
+          <MeaningItem
+            key={index}
+            meaning={meaning}
+            onSearch={onSearch}
+            loadingWord={loadingWord}
+          />
         ))}
       </div>
     )

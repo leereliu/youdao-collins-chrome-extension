@@ -160,6 +160,7 @@ function IndexPopup() {
   const [explain, setExplain] = useState<WordResponse | null>(null)
   const [history, setHistory] = useState<SearchHistoryItem[]>([])
   const [currentWord, setCurrentWord] = useState("")
+  const [loadingWord, setLoadingWord] = useState<string | null>(null)
   const currentWordRef = useRef("")
 
   // 同步 currentWord 到 ref
@@ -237,6 +238,8 @@ function IndexPopup() {
   const search = async (word: string) => {
     if (!word) return
 
+    setLoadingWord(word) // 设置正在加载的单词
+
     try {
       const res = await searchWord(word)
       const push = shouldPush(history, word, res)
@@ -251,6 +254,8 @@ function IndexPopup() {
       setHistory(newHistory)
     } catch (error) {
       console.error("Search failed:", error)
+    } finally {
+      setLoadingWord(null) // 清除加载状态
     }
   }
 
@@ -281,6 +286,7 @@ function IndexPopup() {
             showNotebook
             searchHistory={history}
             onBack={history.length > 1 ? jumpBack : undefined}
+            loadingWord={loadingWord}
           />
         </div>
       ) : (

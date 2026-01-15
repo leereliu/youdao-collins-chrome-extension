@@ -119,6 +119,7 @@ function TranslatorOverlay() {
   const [searchHistory, setSearchHistory] = useState<
     Array<{ word: string; result: WordResponse }>
   >([])
+  const [loadingWord, setLoadingWord] = useState<string | null>(null)
   const lastWordRef = useRef("")
   const justOpenedRef = useRef(false)
   const currentWordRef = useRef("")
@@ -207,6 +208,7 @@ function TranslatorOverlay() {
     setCurrentWord(word)
     setLoading(true)
     setResult(null)
+    setLoadingWord(word) // 设置正在加载的单词
 
     try {
       const response = await searchWord(word)
@@ -225,6 +227,7 @@ function TranslatorOverlay() {
     } finally {
       if (word === lastWordRef.current) {
         setLoading(false)
+        setLoadingWord(null) // 清除加载状态
       }
     }
   }
@@ -397,6 +400,7 @@ function TranslatorOverlay() {
           showNotebook={options?.showNotebook ?? true}
           searchHistory={searchHistory}
           onBack={handleBack}
+          loadingWord={loadingWord}
         />
       </PopupContainer>
     </div>
