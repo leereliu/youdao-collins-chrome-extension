@@ -1,0 +1,67 @@
+{
+  "name": "youdao-collins-chrome-extension",
+  "displayName": "划词翻译(柯林斯词典)+扇贝生词本",
+  "version": "2.0.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core",
+      "esbuild",
+      "less",
+      "lmdb",
+      "msgpackr-extract",
+      "sharp"
+    ]
+  },
+  "description": "查询单词柯林斯释义，支持划词翻译，数据来源于有道词典。接入扇贝生词本，快速记录新单词，方便未来学习。",
+  "author": "oyyd <oyydoibh@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "plasmo": "^0.90.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+    "@plasmohq/prettier-plugin-sort-imports": "^4.0.1",
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "prettier": "^3.4.2",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "manifest": {
+    "permissions": [
+      "storage",
+      "activeTab",
+      "tabs"
+    ],
+    "host_permissions": [
+      "http://dict.youdao.com/*",
+      "https://api.shanbay.com/*"
+    ],
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Ctrl+Q",
+          "mac": "MacCtrl+Q"
+        }
+      }
+    }
+  }
+}

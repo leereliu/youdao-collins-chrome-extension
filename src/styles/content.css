@@ -1,0 +1,137 @@
+/* Content Script 专用样式 */
+/* 使用特定前缀避免与页面样式冲突 */
+
+.youdao-collins-popup {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.yc-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  min-width: 280px;
+  max-width: 400px;
+  animation: yc-slide-up 0.2s ease-out;
+}
+
+@keyframes yc-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.yc-loading {
+  color: #6b7280;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.yc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.yc-word {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.yc-phonetic {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.yc-error {
+  color: #dc2626;
+  font-size: 13px;
+}
+
+.yc-definitions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yc-definition {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.yc-pos {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.yc-meaning {
+  color: #374151;
+}
+
+.yc-examples {
+  margin-top: 4px;
+  padding-left: 12px;
+  border-left: 2px solid #e5e7eb;
+}
+
+.yc-example {
+  font-size: 13px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.yc-collins {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.yc-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.yc-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.yc-btn:hover {
+  background: #1d4ed8;
+}
+
+.yc-btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.yc-btn-secondary:hover {
+  background: #e5e7eb;
+}

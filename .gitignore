@@ -1,11 +1,41 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Plasmo build output
+.plasmo/
+build/
+chrome-mv3-dev/
+chrome-mv3-prod/
+
+# IDE
+.idea/
+*.swp
+*.swo
+.vscode/
+
+# OS
 .DS_Store
-WORK.md
-/build
-dev
-npm-debug.log
-configs/crx.pem
-build.crx
-build.zip
-.history
-.package-lock.json
+Thumbs.db
+
+# Testing
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Package managers
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Build artifacts
+*.zip
+*.crx
+*.pem
+!build.pem
