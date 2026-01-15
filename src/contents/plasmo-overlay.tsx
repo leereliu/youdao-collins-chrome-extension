@@ -205,14 +205,15 @@ function TranslatorOverlay() {
     if (!word || word === lastWordRef.current) return
     lastWordRef.current = word
 
-    // 设置正在加载的单词
+    // 立即更新 currentWord 和清空 result，避免显示旧内容
+    setCurrentWord(word)
+    setResult(null)
     setLoadingWord(word)
 
     try {
       const response = await searchWord(word)
       if (word === lastWordRef.current) {
-        // 只有在请求成功后才更新 currentWord 和 result
-        setCurrentWord(word)
+        // 更新结果
         setResult(response)
         
         // 添加到历史记录（跳过返回操作）
@@ -222,7 +223,6 @@ function TranslatorOverlay() {
       }
     } catch {
       if (word === lastWordRef.current) {
-        setCurrentWord(word)
         setResult({ type: "error" })
       }
     } finally {

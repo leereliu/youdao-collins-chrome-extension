@@ -119,6 +119,17 @@ export function AddWordIcon({ word, onAdd }: AddWordIconProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // 当单词变化时，重置状态
+  useEffect(() => {
+    setStatus("idle")
+    setErrorMsg(null)
+    setShowTip(false)
+    successRef.current = false
+    pendingRef.current = false
+    if (timerRef.current) clearTimeout(timerRef.current)
+    if (tipTimerRef.current) clearTimeout(tipTimerRef.current)
+  }, [word])
+
   const showErrorTip = useCallback((msg: string) => {
     setErrorMsg(msg)
     setShowTip(true)
@@ -547,7 +558,11 @@ export function WordDetail({
   const handleOpenYoudao = () => onOpenLink(currentWord)
   const canGoBack = searchHistory.length > 1
 
-  if (!result || result.type === "error") {
+  if (!result) {
+    return <div>正在加载 "{currentWord}" ...</div>
+  }
+
+  if (result.type === "error") {
     return (
       <p style={STYLES.errorP}>
         未找到结果。
