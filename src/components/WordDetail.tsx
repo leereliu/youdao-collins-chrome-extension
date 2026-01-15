@@ -12,7 +12,7 @@ import type {
   MachineTranslationResponse,
   Synonyms,
   WordInfo,
-  Meaning,
+  Meaning
 } from "../lib/types"
 
 // ============ 样式常量 ============
@@ -24,20 +24,38 @@ const COLORS = {
   primary: "#0275d8",
   success: "#5cb85c",
   mainBG: "#eff5f8",
-  border: "#D4D4D5",
+  border: "#D4D4D5"
 }
 
 const STYLES = {
   info: { marginBottom: 10 },
-  infoItem: { marginRight: 10, display: "inline-block", verticalAlign: "middle" },
+  infoItem: {
+    marginRight: 10,
+    display: "inline-block",
+    verticalAlign: "middle"
+  },
   wordType: { fontSize: 12, marginRight: 4, color: COLORS.muted },
   meaningItem: { marginBottom: 10 },
-  explain: { padding: "4px 8px", backgroundColor: COLORS.mainBG, borderRadius: 4 },
-  exampleItem: { marginTop: 8, paddingLeft: 20, color: COLORS.muted, fontSize: 13 },
-  choiceItem: { backgroundColor: COLORS.mainBG, padding: "4px 8px", marginBottom: 8, borderRadius: 4 },
+  explain: {
+    padding: "4px 8px",
+    backgroundColor: COLORS.mainBG,
+    borderRadius: 4
+  },
+  exampleItem: {
+    marginTop: 8,
+    paddingLeft: 20,
+    color: COLORS.muted,
+    fontSize: 13
+  },
+  choiceItem: {
+    backgroundColor: COLORS.mainBG,
+    padding: "4px 8px",
+    marginBottom: 8,
+    borderRadius: 4
+  },
   link: { fontSize: 12, color: COLORS.primary, cursor: "pointer" },
   errorP: { fontSize: 12, margin: "8px 0 0 0" },
-  synonyms: { marginTop: 4, fontSize: 12 },
+  synonyms: { marginTop: 4, fontSize: 12 }
 }
 
 // ============ 小图标组件 ============
@@ -48,7 +66,7 @@ interface AudioIconProps {
 
 export function AudioIcon({ word }: AudioIconProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
-  
+
   const play = () => audioRef.current?.play()
   const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
 
@@ -56,17 +74,25 @@ export function AudioIcon({ word }: AudioIconProps) {
     width: 14,
     height: 14,
     display: "inline-block",
-    verticalAlign: "middle",
+    verticalAlign: "middle"
   }
-  
+
   return (
-    <span 
-      style={{ cursor: "pointer", verticalAlign: "middle", display: "inline-flex", alignItems: "center" }}
+    <span
+      style={{
+        cursor: "pointer",
+        verticalAlign: "middle",
+        display: "inline-flex",
+        alignItems: "center"
+      }}
       onClick={play}
       title="播放发音"
     >
       <svg style={iconStyle} viewBox="0 0 24 24">
-        <path fill={COLORS.muted} d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+        <path
+          fill={COLORS.muted}
+          d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+        />
       </svg>
       <audio ref={audioRef} src={url} preload="none" />
     </span>
@@ -81,31 +107,52 @@ interface AddWordIconProps {
 }
 
 export function AddWordIcon({ word, onAdd }: AddWordIconProps) {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle")
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [showTip, setShowTip] = useState(false)
   const successRef = useRef(false)
   const pendingRef = useRef(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  
+  const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const showErrorTip = useCallback((msg: string) => {
+    setErrorMsg(msg)
+    setShowTip(true)
+    if (tipTimerRef.current) clearTimeout(tipTimerRef.current)
+    tipTimerRef.current = setTimeout(() => setShowTip(false), 3000)
+  }, [])
+
   const doAdd = useCallback(async () => {
     if (successRef.current) return
-    
+
     try {
       const response = await onAdd(word)
       if (successRef.current) return
-      
+
       if (response.success) {
         successRef.current = true
         setStatus("success")
       } else {
         setStatus("error")
+        // 显示错误提示
+        if (response.msg === "Shanbay: Word Not Found!") {
+          showErrorTip("扇贝词库中没有此单词")
+        } else if (response.msg === "Invalid Token!") {
+          showErrorTip("请先登录扇贝")
+        } else {
+          showErrorTip(response.msg || "添加失败")
+        }
       }
     } catch {
       if (!successRef.current) {
         setStatus("error")
+        showErrorTip("网络错误")
       }
     }
-  }, [word, onAdd])
-  
+  }, [word, onAdd, showErrorTip])
+
   const handleClick = useCallback(() => {
     // 成功后点击跳转到扇贝生词本
     if (successRef.current || status === "success") {
@@ -113,31 +160,31 @@ export function AddWordIcon({ word, onAdd }: AddWordIconProps) {
       return
     }
     if (pendingRef.current) return
-    
+
     pendingRef.current = true
     if (timerRef.current) clearTimeout(timerRef.current)
-    
+
     timerRef.current = setTimeout(() => {
       pendingRef.current = false
       doAdd()
     }, 200)
   }, [status, doAdd])
-  
+
   const getColor = () => {
     if (status === "success") return COLORS.success
     if (status === "error") return COLORS.danger
     return COLORS.primary
   }
-  
+
   const getSymbol = () => {
     if (status === "success") return "✓"
     if (status === "error") return "!"
     return "+"
   }
-  
+
   const getTitle = () => {
     if (status === "success") return "已添加，点击查看生词本"
-    if (status === "error") return "添加失败，点击重试"
+    if (status === "error") return errorMsg || "添加失败，点击重试"
     return "添加到扇贝生词本"
   }
 
@@ -146,19 +193,46 @@ export function AddWordIcon({ word, onAdd }: AddWordIconProps) {
     height: 14,
     display: "inline-block",
     verticalAlign: "middle",
-    fill: getColor(),
+    fill: getColor()
   }
-  
+
+  const tipStyle: React.CSSProperties = {
+    position: "absolute",
+    top: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    marginTop: 4,
+    padding: "4px 8px",
+    backgroundColor: COLORS.danger,
+    color: "#fff",
+    fontSize: 12,
+    borderRadius: 4,
+    whiteSpace: "nowrap",
+    zIndex: 1000,
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+  }
+
   return (
-    <span 
-      style={{ cursor: "pointer", verticalAlign: "middle", color: getColor(), display: "inline-flex", alignItems: "center" }}
+    <span
+      style={{
+        cursor: "pointer",
+        verticalAlign: "middle",
+        color: getColor(),
+        display: "inline-flex",
+        alignItems: "center",
+        position: "relative"
+      }}
       onClick={handleClick}
       title={getTitle()}
     >
       <svg style={iconStyle} viewBox="0 0 24 24">
-        <path fill={getColor()} d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
+        <path
+          fill={getColor()}
+          d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"
+        />
       </svg>
       <span style={{ fontSize: 10, marginLeft: 1 }}>{getSymbol()}</span>
+      {showTip && errorMsg && <span style={tipStyle}>{errorMsg}</span>}
     </span>
   )
 }
@@ -187,33 +261,37 @@ interface ClickableContentProps {
 
 function ClickableContent({ html, onSearch }: ClickableContentProps) {
   // 解析 HTML，提取链接并替换为可点击元素
-  const parts: Array<{ type: "text" | "link"; content: string; word?: string }> = []
-  
+  const parts: Array<{
+    type: "text" | "link"
+    content: string
+    word?: string
+  }> = []
+
   // 匹配 <a href="...">text</a> 格式
   const linkRegex = /<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/gi
   let lastIndex = 0
   let match: RegExpExecArray | null
-  
+
   while ((match = linkRegex.exec(html)) !== null) {
     // 添加链接前的文本
     if (match.index > lastIndex) {
       parts.push({ type: "text", content: html.slice(lastIndex, match.index) })
     }
-    
+
     // 添加链接
     const href = match[1]
     const text = match[2]
     const word = extractWordFromLink(href) || text.trim()
     parts.push({ type: "link", content: text, word })
-    
+
     lastIndex = match.index + match[0].length
   }
-  
+
   // 添加剩余的文本
   if (lastIndex < html.length) {
     parts.push({ type: "text", content: html.slice(lastIndex) })
   }
-  
+
   // 如果没有解析出任何链接，直接渲染原始 HTML
   if (parts.length === 0 || (parts.length === 1 && parts[0].type === "text")) {
     return <span dangerouslySetInnerHTML={{ __html: html }} />
@@ -223,7 +301,12 @@ function ClickableContent({ html, onSearch }: ClickableContentProps) {
     <span>
       {parts.map((part, index) => {
         if (part.type === "text") {
-          return <span key={index} dangerouslySetInnerHTML={{ __html: part.content }} />
+          return (
+            <span
+              key={index}
+              dangerouslySetInnerHTML={{ __html: part.content }}
+            />
+          )
         }
         return (
           <span
@@ -249,7 +332,13 @@ interface WordBasicProps {
   onAddWord: (word: string) => Promise<{ success: boolean; msg?: string }>
 }
 
-function WordBasic({ wordInfo, synonyms, search, showNotebook, onAddWord }: WordBasicProps) {
+function WordBasic({
+  wordInfo,
+  synonyms,
+  search,
+  showNotebook,
+  onAddWord
+}: WordBasicProps) {
   const { word, pronunciation, frequence, rank, additionalPattern } = wordInfo
 
   let synonymsEle = null
@@ -274,21 +363,45 @@ function WordBasic({ wordInfo, synonyms, search, showNotebook, onAddWord }: Word
   return (
     <div style={STYLES.info}>
       <div>
-        <span style={{ ...STYLES.infoItem, color: COLORS.danger, fontWeight: 600 }}>{word}</span>
+        <span
+          style={{ ...STYLES.infoItem, color: COLORS.danger, fontWeight: 600 }}
+        >
+          {word}
+        </span>
         {pronunciation && (
-          <span style={{ ...STYLES.infoItem, fontStyle: "italic", color: COLORS.muted }}>
+          <span
+            style={{
+              ...STYLES.infoItem,
+              fontStyle: "italic",
+              color: COLORS.muted
+            }}
+          >
             {pronunciation}
           </span>
         )}
-        <span style={STYLES.infoItem}><AudioIcon word={word} /></span>
+        <span style={STYLES.infoItem}>
+          <AudioIcon word={word} />
+        </span>
         {showNotebook && (
-          <span style={STYLES.infoItem}><AddWordIcon word={word} onAdd={onAddWord} /></span>
+          <span style={STYLES.infoItem}>
+            <AddWordIcon word={word} onAdd={onAddWord} />
+          </span>
         )}
-        {frequence && <span style={STYLES.infoItem}>{renderFrequence(frequence)}</span>}
-        {rank && <span style={{ ...STYLES.infoItem, fontSize: 12, fontWeight: "bold" }}>{rank}</span>}
+        {frequence && (
+          <span style={STYLES.infoItem}>{renderFrequence(frequence)}</span>
+        )}
+        {rank && (
+          <span
+            style={{ ...STYLES.infoItem, fontSize: 12, fontWeight: "bold" }}
+          >
+            {rank}
+          </span>
+        )}
       </div>
       {additionalPattern && (
-        <div style={{ marginTop: 4, fontSize: 12, color: COLORS.muted }}>( {additionalPattern} )</div>
+        <div style={{ marginTop: 4, fontSize: 12, color: COLORS.muted }}>
+          ( {additionalPattern} )
+        </div>
       )}
       {synonymsEle}
     </div>
@@ -301,8 +414,11 @@ interface MeaningItemProps {
 }
 
 function MeaningItem({ meaning, onSearch }: MeaningItemProps) {
-  const { example: { eng, ch }, explain: { type, typeDesc, engExplain } } = meaning
-  
+  const {
+    example: { eng, ch },
+    explain: { type, typeDesc, engExplain }
+  } = meaning
+
   return (
     <div style={STYLES.meaningItem}>
       <div style={STYLES.explain}>
@@ -344,7 +460,7 @@ export function WordDetail({
   onSearch,
   onOpenLink,
   onAddWord,
-  showNotebook = true,
+  showNotebook = true
 }: WordDetailProps) {
   const handleOpenYoudao = () => onOpenLink(currentWord)
 
@@ -373,7 +489,13 @@ export function WordDetail({
             <span style={STYLES.wordType}>{choice.wordType}</span>
             <span style={{ cursor: "pointer", color: COLORS.primary }}>
               {choice.words.map((w) => (
-                <span key={w} style={{ marginRight: 8 }} onClick={() => onSearch(w)}>{w}</span>
+                <span
+                  key={w}
+                  style={{ marginRight: 8 }}
+                  onClick={() => onSearch(w)}
+                >
+                  {w}
+                </span>
               ))}
             </span>
           </div>
@@ -384,7 +506,9 @@ export function WordDetail({
 
   // machine_translation
   if (result.type === "machine_translation") {
-    return <div style={STYLES.choiceItem}>(机翻) {result.response.translation}</div>
+    return (
+      <div style={STYLES.choiceItem}>(机翻) {result.response.translation}</div>
+    )
   }
 
   // explain
