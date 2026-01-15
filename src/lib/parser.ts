@@ -4,6 +4,7 @@
  */
 
 import * as cheerio from "cheerio"
+import type { AnyNode } from "domhandler"
 
 // ============ 类型定义 ============
 
@@ -102,7 +103,7 @@ function getFrequency(className: string | undefined): number | null {
 
 // ============ 解析函数 ============
 
-function getInfo($container: cheerio.Cheerio<cheerio.Element>): Omit<WordInfo, "pronunciation"> {
+function getInfo($container: cheerio.Cheerio<AnyNode>): Omit<WordInfo, "pronunciation"> {
   const word = $container.find(".title").text()
   const $star = $container.find(".star")
   const frequence = $star.length > 0 ? getFrequency($star.attr("class")) : null
@@ -118,7 +119,7 @@ function getInfo($container: cheerio.Cheerio<cheerio.Element>): Omit<WordInfo, "
 }
 
 function getExplain(
-  $explain: cheerio.Cheerio<cheerio.Element>
+  $explain: cheerio.Cheerio<AnyNode>
 ): MeaningExplain {
   const $type = $explain.find(".additional")
   const type = $type.text()
@@ -137,7 +138,7 @@ function getExplain(
 }
 
 function getExample(
-  $example: cheerio.Cheerio<cheerio.Element>
+  $example: cheerio.Cheerio<AnyNode>
 ): MeaningExample {
   const $examples = $example.find(".examples p")
   const eng = $examples.eq(0).text()
@@ -151,7 +152,7 @@ function getExample(
 
 function getMeanings(
   $: cheerio.CheerioAPI,
-  $items: cheerio.Cheerio<cheerio.Element>
+  $items: cheerio.Cheerio<AnyNode>
 ): { meanings: Meaning[] } {
   const meanings: Meaning[] = []
 
@@ -221,7 +222,7 @@ function getChoices($: cheerio.CheerioAPI): ChoiceResponse {
   return { choices }
 }
 
-function getSynonyms($: cheerio.Cheerio<cheerio.Element>): Synonyms {
+function getSynonyms($: cheerio.Cheerio<AnyNode>): Synonyms {
   const $type = $.find(".wt-container>.additional")
   const type = $type.length > 0 ? $type.text() : ""
   const $anchor = $.find(".wt-container>a")

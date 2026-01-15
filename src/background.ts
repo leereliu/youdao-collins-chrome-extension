@@ -7,7 +7,12 @@ import { EVENTS } from "./lib/types"
 import { onMessage } from "./lib/message"
 import { parse, type WordResponse } from "./lib/parser"
 import { getWordURL, hasWord } from "./lib/storage"
-import { lookUp, addWord, initNotificationListener, notify } from "./lib/shanbay"
+import {
+  lookUp,
+  addWord,
+  initNotificationListener,
+  notify
+} from "./lib/shanbay"
 
 // 初始化通知点击监听器
 initNotificationListener()
@@ -40,9 +45,9 @@ async function getWords(
   // 有道词典无法识别 `/` 和 `%`，需要转义
   let _word = word.replace(/\//g, "<&>")
   _word = _word.replace(/%/g, "<$>")
-  
+
   const url = getWordURL(_word)
-  
+
   try {
     const response = await fetch(url)
     const body = await response.text()
@@ -76,7 +81,7 @@ async function addWordToShanbay(
     sendRes({ success: true })
   } catch (err: unknown) {
     const error = err as { msg?: string }
-    
+
     if (error.msg === "单词没找到") {
       sendRes({ success: false, msg: "Shanbay: Word Not Found!" })
       return
@@ -86,9 +91,9 @@ async function addWordToShanbay(
     notify({
       title: "扇贝认证失败",
       message: "点击此消息登录扇贝",
-      url: "https://web.shanbay.com/web/account/login/",
+      url: "https://web.shanbay.com/web/account/login/"
     })
-    
+
     sendRes({ success: false, msg: "Invalid Token!" })
   }
 }

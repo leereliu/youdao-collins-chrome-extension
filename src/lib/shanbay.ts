@@ -88,7 +88,10 @@ export function notify(
     pendingNotifications.set(noteID, opt.url)
   }
 
-  chrome.notifications.create(noteID, options)
+  chrome.notifications.create(
+    noteID,
+    options as chrome.notifications.NotificationOptions<true>
+  )
 }
 
 // ============ 请求工具 ============
