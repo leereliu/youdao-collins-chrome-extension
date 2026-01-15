@@ -67,7 +67,7 @@ async function getLLMTranslationStream(
           Authorization: `Bearer ${apiKey}`,
           "Content-Type": "application/json",
           "X-Title": "Youdao-Collins-Translator",
-          "HTTP-Referer": chrome.runtime.getURL(""),
+          "HTTP-Referer": chrome.runtime.getURL("")
         },
         body: JSON.stringify({
           model: "xiaomi/mimo-v2-flash:free",
@@ -198,26 +198,41 @@ async function getWords(
         machineTranslation = explain.response.explains
           .map((e) => e.explain)
           .join("；")
+      } else {
+        // 有道未找到翻译，但 AI 翻译已启动，显示提示信息
+        machineTranslation = `未找到结果。去有道搜索"${word}"`
       }
 
-      if (machineTranslation) {
-        sendRes({
-          type: "llm_translation",
-          response: {
-            machineTranslation,
-            aiTranslation: "",
-            isStreaming: true
-          }
-        })
-        return
-      }
+      sendRes({
+        type: "llm_translation",
+        response: {
+          machineTranslation,
+          aiTranslation: "",
+          isStreaming: true
+        }
+      })
+      return
     }
 
     // 没有配置 API Key 或不是长文本，直接返回有道结果
     sendRes(explain)
   } catch (error) {
     console.error("Failed to fetch word:", error)
-    sendRes({ type: "error" })
+    
+    // 如果有道翻译失败，但 AI 翻译已启动，返回错误提示 + AI 翻译
+    if (aiTranslationStarted) {
+      sendRes({
+        type: "llm_translation",
+        response: {
+          machineTranslation: `有道翻译请求失败。去有道搜索"${word}"`,
+          aiTranslation: "",
+          isStreaming: true
+        }
+      })
+    } else {
+      // 没有启动 AI 翻译，返回错误
+      sendRes({ type: "error" })
+    }
   }
 }
 

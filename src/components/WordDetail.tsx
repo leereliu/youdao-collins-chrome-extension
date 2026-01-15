@@ -506,6 +506,30 @@ export function WordDetail({
   if (result.type === "llm_translation") {
     const { machineTranslation, aiTranslation, isStreaming } = result.response
 
+    // 检查是否包含"去有道搜索"提示
+    const hasYoudaoLink = machineTranslation.includes("去有道搜索")
+    const renderMachineTranslation = () => {
+      if (hasYoudaoLink) {
+        // 解析并渲染带有链接的文本
+        const match = machineTranslation.match(/(.*)去有道搜索"(.+)"/)
+        if (match) {
+          const [, prefix, searchWord] = match
+          return (
+            <span>
+              {prefix}
+              <span
+                style={{ color: COLORS.primary, cursor: "pointer" }}
+                onClick={() => onOpenLink(searchWord)}
+              >
+                去有道搜索"{searchWord}"
+              </span>
+            </span>
+          )
+        }
+      }
+      return machineTranslation
+    }
+
     return (
       <div>
         {/* 有道机翻部分 - 始终显示 */}
@@ -526,10 +550,10 @@ export function WordDetail({
               borderRadius: 4,
               fontSize: 13,
               lineHeight: 1.6,
-              color: "#555"
+              color: hasYoudaoLink ? COLORS.danger : "#555"
             }}
           >
-            {machineTranslation}
+            {renderMachineTranslation()}
           </div>
         </div>
 
