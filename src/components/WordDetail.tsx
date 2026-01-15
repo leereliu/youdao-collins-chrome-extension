@@ -5,6 +5,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import type { WordResponse, Synonyms, WordInfo, Meaning } from "../lib/types"
+import { getOptions } from "../lib/storage"
 
 // ============ 样式常量 ============
 
@@ -61,10 +62,8 @@ export function AudioIcon({ word }: AudioIconProps) {
 
   // 加载发音配置
   useEffect(() => {
-    import("~lib/storage").then(({ getOptions }) => {
-      getOptions().then((options) => {
-        setPronunciationType(options.pronunciation || "us")
-      })
+    getOptions().then((options) => {
+      setPronunciationType(options.pronunciation || "us")
     })
   }, [])
 
