@@ -1,70 +1,132 @@
-export {}
-
-// Plasmo Messaging Handler 示例
-// 在 background/messages/ 目录下创建具体的消息处理器
-
-// 监听扩展安装或更新
-chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === "install") {
-    console.log("扩展已安装")
-    // 初始化默认设置
-    chrome.storage.sync.set({
-      translateMode: "modifier",
-      modifierKey: "ctrl",
-      enableShanbay: false
-    })
-  } else if (details.reason === "update") {
-    console.log("扩展已更新到版本:", chrome.runtime.getManifest().version)
-  }
-})
-
-// 监听来自 content script 或 popup 的消息
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "QUERY_WORD") {
-    // TODO: 实现查询逻辑
-    handleQueryWord(message.word)
-      .then(sendResponse)
-      .catch((error) => sendResponse({ error: error.message }))
-    return true // 异步响应
-  }
-
-  if (message.type === "ADD_TO_SHANBAY") {
-    // TODO: 实现添加到扇贝生词本
-    handleAddToShanbay(message.word)
-      .then(sendResponse)
-      .catch((error) => sendResponse({ error: error.message }))
-    return true
-  }
-})
-
 /**
- * 查询单词（从有道词典获取柯林斯释义）
+ * Background Service Worker
+ * 处理消息通信和 API 调用
  */
-async function handleQueryWord(word: string): Promise<{ data?: unknown; error?: string }> {
+
+import { EVENTS } from "./lib/types"
+import { onMessage } from "./lib/message"
+import { parse, type WordResponse } from "./lib/parser"
+import { getWordURL, hasWord } from "./lib/storage"
+import { lookUp, addWord, initNotificationListener, notify } from "./lib/shanbay"
+
+// 初始化通知点击监听器
+initNotificationListener()
+
+// ============ 单词查询处理 ============
+
+interface ExplainResponseWithAdded extends WordResponse {
+  added?: boolean
+}
+
+async function getWordExplain(body: string): Promise<ExplainResponseWithAdded> {
+  const explain = parse(body) as ExplainResponseWithAdded
+
+  // 检查单词是否已添加到生词本
+  if (
+    explain &&
+    explain.type === "explain" &&
+    explain.response.wordInfo?.word
+  ) {
+    const word = explain.response.wordInfo.word
+    const added = await hasWord(word)
+    explain.added = added
+  }
+
+  return explain
+}
+
+async function getWords(
+  word: string,
+  sendRes: (response: ExplainResponseWithAdded) => void
+): Promise<void> {
+  // 有道词典无法识别 `/` 和 `%`，需要转义
+  let _word = word.replace(/\//g, "<&>")
+  _word = _word.replace(/%/g, "<$>")
+  
+  const url = getWordURL(_word)
+  
   try {
-    const url = `http://dict.youdao.com/w/eng/${encodeURIComponent(word)}`
     const response = await fetch(url)
-    const html = await response.text()
-    
-    // TODO: 使用 cheerio 解析页面
-    // 这里返回原始 HTML，后续实现解析逻辑
-    return { data: { word, html } }
+    const body = await response.text()
+    const explain = await getWordExplain(body)
+    sendRes(explain)
   } catch (error) {
-    console.error("查询单词失败:", error)
-    return { error: "查询失败，请稍后重试" }
+    console.error("Failed to fetch word:", error)
+    sendRes({ type: "error" })
   }
 }
 
-/**
- * 添加单词到扇贝生词本
- */
-async function handleAddToShanbay(word: string): Promise<{ success?: boolean; error?: string }> {
+// ============ 扇贝生词本处理 ============
+
+interface AddWordResponse {
+  success: boolean
+  msg?: string
+}
+
+async function addWordToShanbay(
+  word: string,
+  sendRes: (response: AddWordResponse) => void
+): Promise<void> {
   try {
-    // TODO: 实现扇贝 API 调用
-    console.log("添加到扇贝:", word)
-    return { success: true }
-  } catch (error) {
-    console.error("添加到扇贝失败:", error)
-    return { error: "添加失败，请检查是否已登录扇贝" }
+    // 获取扇贝单词 ID
+    const response = await lookUp(word)
+    const { id } = response
+
+    // 添加单词
+    await addWord(id)
+
+    sendRes({ success: true })
+  } catch (err: unknown) {
+    const error = err as { msg?: string }
+    
+    if (error.msg === "单词没找到") {
+      sendRes({ success: false, msg: "Shanbay: Word Not Found!" })
+      return
+    }
+
+    // 显示系统通知（认证失败）
+    notify({
+      title: "扇贝认证失败",
+      message: "点击此消息登录扇贝",
+      url: "https://web.shanbay.com/web/account/login/",
+    })
+    
+    sendRes({ success: false, msg: "Invalid Token!" })
   }
 }
+
+// ============ 新标签页打开 ============
+
+function openNewTab(word: string): void {
+  chrome.tabs.create({ url: getWordURL(word) })
+}
+
+// ============ 初始化消息监听 ============
+
+function init(): void {
+  onMessage<string, ExplainResponseWithAdded>(
+    EVENTS.SEARCH_WORD,
+    (data, sendRes) => {
+      getWords(data, sendRes)
+    }
+  )
+
+  onMessage<string, void>(EVENTS.OPEN_NEW_TAB, (data) => {
+    openNewTab(data)
+  })
+
+  onMessage<string, AddWordResponse>(
+    EVENTS.ADD_WORD_SHANBAY,
+    (data, sendRes) => {
+      addWordToShanbay(data, sendRes)
+    }
+  )
+
+  onMessage(EVENTS.CLEAR_SHANBAY_TOKEN, () => {
+    // 清除 token 的逻辑（如果需要）
+  })
+}
+
+init()
+
+export {}

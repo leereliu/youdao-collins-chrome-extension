@@ -1,91 +1,78 @@
 /**
- * 划词翻译模式
+ * 全局类型定义
  */
-export type TranslateMode = "instant" | "modifier" | "doubleClick" | "disabled"
 
-/**
- * 修饰键类型
- */
-export type ModifierKey = "ctrl" | "meta"
+// 导出解析器类型
+export type {
+  WordInfo,
+  Meaning,
+  MeaningExplain,
+  MeaningExample,
+  Synonyms,
+  ExplainResponse,
+  Choice,
+  ChoiceResponse,
+  NonCollinsExplain,
+  NonCollinsExplainsResponse,
+  MachineTranslationResponse,
+  ResponseType,
+  WordResponse,
+} from "./parser"
 
-/**
- * 用户设置
- */
-export interface UserOptions {
-  translateMode: TranslateMode
-  modifierKey: ModifierKey
-  enableShanbay: boolean
-}
+// ============ 消息事件类型 ============
 
-/**
- * 默认设置
- */
-export const DEFAULT_OPTIONS: UserOptions = {
-  translateMode: "modifier",
-  modifierKey: "ctrl",
-  enableShanbay: false
-}
+export const EVENTS = {
+  SEARCH_WORD: "SEARCH_WORD",
+  OPEN_NEW_TAB: "OPEN_NEW_TAB",
+  ADD_WORD_SHANBAY: "ADD_WORD_SHANBAY",
+  CLEAR_SHANBAY_TOKEN: "CLEAR_SHANBAY_TOKEN",
+} as const
 
-/**
- * 单词定义
- */
-export interface WordDefinition {
-  /** 词性 */
-  pos: string
-  /** 释义 */
-  meaning: string
-  /** 例句 */
-  examples?: string[]
-}
+export type EventName = (typeof EVENTS)[keyof typeof EVENTS]
 
-/**
- * 柯林斯释义
- */
-export interface CollinsDefinition {
-  /** 英文解释 */
-  explanation: string
-  /** 例句 */
-  examples?: string[]
-  /** 星级 (1-5) */
-  star?: number
-}
-
-/**
- * 查询结果
- */
-export interface QueryResult {
-  /** 查询的单词 */
-  word: string
-  /** 音标 */
-  phonetic?: string
-  /** 发音 URL */
-  audioUrl?: string
-  /** 基础释义 */
-  definitions?: WordDefinition[]
-  /** 柯林斯释义 */
-  collins?: CollinsDefinition[]
-  /** 错误信息 */
-  error?: string
-}
-
-/**
- * 消息类型
- */
-export type MessageType = "QUERY_WORD" | "ADD_TO_SHANBAY" | "GET_OPTIONS"
-
-/**
- * 消息格式
- */
-export interface Message {
-  type: MessageType
-  [key: string]: unknown
-}
-
-/**
- * 扇贝生词本 API 响应
- */
-export interface ShanbayResponse {
-  status_code: number
-  msg: string
+export interface MessageRequest {
+  eventName: EventName
   data?: unknown
+}
+
+export interface ShanbayAddResponse {
+  success: boolean
+  msg?: string
+}
+
+// ============ 选项配置类型 ============
+
+export type ActiveType = "ALWAYS" | "KEY_DOWN" | "DOUBLE_CLICK" | "NEVER"
+
+export interface Options {
+  activeType: ActiveType
+  showNotebook: boolean
+  tempDisabled: boolean
+  showContainChinese?: boolean
+}
+
+export const ACTIVE_TYPES: Record<ActiveType, string> = {
+  ALWAYS: "划词即翻译",
+  KEY_DOWN: "按住(meta/ctrl)键 + 划词时翻译",
+  DOUBLE_CLICK: "双击单词后翻译",
+  NEVER: "禁用划词翻译",
+}
+
+export const DEFAULT_OPTIONS: Options = {
+  activeType: "ALWAYS",
+  showNotebook: true,
+  tempDisabled: false,
+  showContainChinese: false,
+}
+
+// ============ 扇贝 API 类型 ============
+
+export interface ShanbayLookupResponse {
+  id: string
+  vocabulary_content: string
+  definition: string
+}
+
+export interface ShanbayWordResponse {
+  data: ShanbayLookupResponse[]
 }
