@@ -536,10 +536,6 @@ export function WordDetail({
   const handleOpenYoudao = () => onOpenLink(currentWord)
   const canGoBack = searchHistory.length > 1
 
-  if (loading) {
-    return <div>正在加载 "{currentWord}" ...</div>
-  }
-
   if (!result || result.type === "error") {
     return (
       <p style={STYLES.errorP}>

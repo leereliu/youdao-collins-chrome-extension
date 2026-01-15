@@ -205,14 +205,14 @@ function TranslatorOverlay() {
     if (!word || word === lastWordRef.current) return
     lastWordRef.current = word
 
-    setCurrentWord(word)
-    setLoading(true)
-    setResult(null)
-    setLoadingWord(word) // 设置正在加载的单词
+    // 设置正在加载的单词
+    setLoadingWord(word)
 
     try {
       const response = await searchWord(word)
       if (word === lastWordRef.current) {
+        // 只有在请求成功后才更新 currentWord 和 result
+        setCurrentWord(word)
         setResult(response)
         
         // 添加到历史记录（跳过返回操作）
@@ -222,11 +222,11 @@ function TranslatorOverlay() {
       }
     } catch {
       if (word === lastWordRef.current) {
+        setCurrentWord(word)
         setResult({ type: "error" })
       }
     } finally {
       if (word === lastWordRef.current) {
-        setLoading(false)
         setLoadingWord(null) // 清除加载状态
       }
     }
