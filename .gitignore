@@ -39,3 +39,5 @@ package-lock.json
 *.crx
 *.pem
 !build.pem
+
+tsconfig.tsbuildinfo
