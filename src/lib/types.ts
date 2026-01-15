@@ -45,6 +45,7 @@ export interface ShanbayAddResponse {
 // ============ 选项配置类型 ============
 
 export type ActiveType = "ALWAYS" | "KEY_DOWN" | "DOUBLE_CLICK" | "NEVER"
+export type PronunciationType = "uk" | "us" // 英音 uk=1, 美音 us=2
 
 export interface Options {
   activeType: ActiveType
@@ -52,6 +53,7 @@ export interface Options {
   tempDisabled: boolean
   showContainChinese?: boolean
   aiApiKey?: string  // OpenRouter API Key
+  pronunciation?: PronunciationType // 发音类型
 }
 
 export const ACTIVE_TYPES: Record<ActiveType, string> = {
@@ -61,12 +63,18 @@ export const ACTIVE_TYPES: Record<ActiveType, string> = {
   NEVER: "禁用划词翻译",
 }
 
+export const PRONUNCIATION_TYPES: Record<PronunciationType, string> = {
+  uk: "英音",
+  us: "美音",
+}
+
 export const DEFAULT_OPTIONS: Options = {
   activeType: "ALWAYS",
   showNotebook: true,
   tempDisabled: false,
   showContainChinese: false,
   aiApiKey: "", // 用户需要在设置页面配置
+  pronunciation: "us", // 默认美音
 }
 
 // ============ 扇贝 API 类型 ============

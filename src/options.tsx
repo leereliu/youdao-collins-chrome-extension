@@ -6,7 +6,13 @@
 import { useState, useEffect } from "react"
 import { getOptions, setOptions } from "./lib/storage"
 import { clearShanbayToken } from "./lib/message"
-import { ACTIVE_TYPES, type ActiveType, type Options } from "./lib/types"
+import {
+  ACTIVE_TYPES,
+  PRONUNCIATION_TYPES,
+  type ActiveType,
+  type PronunciationType,
+  type Options
+} from "./lib/types"
 
 import "./styles/globals.css"
 
@@ -54,7 +60,7 @@ function OptionsApp() {
     )
   }
 
-  const { activeType, showContainChinese, aiApiKey } = options
+  const { activeType, showContainChinese, aiApiKey, pronunciation } = options
 
   return (
     <div className="mx-auto max-w-xl p-6 text-sm">
@@ -144,6 +150,28 @@ function OptionsApp() {
                 onChange={() => changeOptions("activeType", type)}
               />
               <span>{ACTIVE_TYPES[type]}</span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      {/* 发音设置 */}
+      <section className="mb-6 rounded-lg border border-gray-200 p-4">
+        <h2 className="mb-3 font-semibold text-gray-700">发音设置</h2>
+        <div className="space-y-2">
+          {(Object.keys(PRONUNCIATION_TYPES) as PronunciationType[]).map((type) => (
+            <label
+              key={type}
+              className="flex cursor-pointer items-center gap-2"
+            >
+              <input
+                name="pronunciation"
+                type="radio"
+                className="h-4 w-4 text-blue-600"
+                checked={(pronunciation || "us") === type}
+                onChange={() => changeOptions("pronunciation", type)}
+              />
+              <span>{PRONUNCIATION_TYPES[type]}</span>
             </label>
           ))}
         </div>

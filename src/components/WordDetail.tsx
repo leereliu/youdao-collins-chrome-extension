@@ -57,9 +57,21 @@ interface AudioIconProps {
 
 export function AudioIcon({ word }: AudioIconProps) {
   const audioRef = useRef<HTMLAudioElement>(null)
+  const [pronunciationType, setPronunciationType] = useState<"uk" | "us">("us")
+
+  // 加载发音配置
+  useEffect(() => {
+    import("~lib/storage").then(({ getOptions }) => {
+      getOptions().then((options) => {
+        setPronunciationType(options.pronunciation || "us")
+      })
+    })
+  }, [])
 
   const play = () => audioRef.current?.play()
-  const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=2`
+  // type=1 英音, type=2 美音
+  const type = pronunciationType === "uk" ? 1 : 2
+  const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=${type}`
 
   const iconStyle: React.CSSProperties = {
     width: 14,
