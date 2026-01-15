@@ -199,8 +199,8 @@ async function getWords(
           .map((e) => e.explain)
           .join("；")
       } else {
-        // 有道未找到翻译，但 AI 翻译已启动，显示提示信息
-        machineTranslation = `未找到结果。去有道搜索"${word}"`
+        // 有道未找到翻译，但 AI 翻译已启动，使用特殊标记
+        machineTranslation = "__ERROR__未找到结果"
       }
 
       sendRes({
@@ -224,7 +224,7 @@ async function getWords(
       sendRes({
         type: "llm_translation",
         response: {
-          machineTranslation: `有道翻译请求失败。去有道搜索"${word}"`,
+          machineTranslation: "__ERROR__有道翻译请求失败",
           aiTranslation: "",
           isStreaming: true
         }
