@@ -14,9 +14,7 @@ initNotificationListener()
 
 // ============ 单词查询处理 ============
 
-interface ExplainResponseWithAdded extends WordResponse {
-  added?: boolean
-}
+type ExplainResponseWithAdded = WordResponse & { added?: boolean }
 
 async function getWordExplain(body: string): Promise<ExplainResponseWithAdded> {
   const explain = parse(body) as ExplainResponseWithAdded
