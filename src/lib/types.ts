@@ -53,6 +53,7 @@ export interface Options {
   tempDisabled: boolean
   showContainChinese?: boolean
   aiApiKey?: string  // OpenRouter API Key
+  aiModel?: string   // AI 模型名称
   pronunciation?: PronunciationType // 发音类型
 }
 
@@ -74,6 +75,7 @@ export const DEFAULT_OPTIONS: Options = {
   tempDisabled: false,
   showContainChinese: false,
   aiApiKey: "", // 用户需要在设置页面配置
+  aiModel: "xiaomi/mimo-v2-flash:free", // 默认免费模型
   pronunciation: "us", // 默认美音
 }
 

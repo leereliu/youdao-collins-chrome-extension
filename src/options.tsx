@@ -60,7 +60,7 @@ function OptionsApp() {
     )
   }
 
-  const { activeType, showContainChinese, aiApiKey, pronunciation } = options
+  const { activeType, showContainChinese, aiApiKey, aiModel, pronunciation } = options
 
   return (
     <div className="mx-auto max-w-xl p-6 text-sm">
@@ -100,7 +100,24 @@ function OptionsApp() {
               className="w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
             />
           </label>
-          <div className="space-y-1 text-xs text-gray-600">
+          {aiApiKey && (
+            <label className="block">
+              <span className="mb-1 block text-sm text-gray-700">
+                模型 <span className="text-red-500">*</span>
+              </span>
+              <input
+                type="text"
+                placeholder="例如: xiaomi/mimo-v2-flash:free"
+                value={aiModel || ""}
+                onChange={(e) => changeOptions("aiModel", e.target.value)}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                推荐免费模型：xiaomi/mimo-v2-flash:free
+              </p>
+            </label>
+          )}
+          <div className="text-xs text-gray-600">
             <p>
               获取免费 API Key：
               <a
@@ -111,9 +128,6 @@ function OptionsApp() {
               >
                 openrouter.ai/keys
               </a>
-            </p>
-            <p className="text-gray-500">
-              推荐模型：xiaomi/mimo-v2-flash:free (完全免费)
             </p>
           </div>
         </div>

@@ -56,6 +56,7 @@ interface StreamCallbacks {
 async function getLLMTranslationStream(
   text: string,
   apiKey: string,
+  model: string,
   callbacks: StreamCallbacks
 ): Promise<void> {
   try {
@@ -70,7 +71,7 @@ async function getLLMTranslationStream(
           "HTTP-Referer": chrome.runtime.getURL("")
         },
         body: JSON.stringify({
-          model: "xiaomi/mimo-v2-flash:free",
+          model: model,
           messages: [
             {
               role: "system",
@@ -171,10 +172,11 @@ async function getWords(
     // 并行：立即检查配置并启动 AI 翻译（不等待有道结果）
     const options = await getOptions()
     const apiKey = options.aiApiKey?.trim()
+    const model = options.aiModel?.trim()
 
-    if (apiKey) {
+    if (apiKey && model) {
       // 立即启动 AI 翻译
-      startStreamingTranslation(word, apiKey)
+      startStreamingTranslation(word, apiKey, model)
       aiTranslationStarted = true
     }
   }
@@ -237,8 +239,8 @@ async function getWords(
 }
 
 // 启动流式翻译
-function startStreamingTranslation(text: string, apiKey: string): void {
-  getLLMTranslationStream(text, apiKey, {
+function startStreamingTranslation(text: string, apiKey: string, model: string): void {
+  getLLMTranslationStream(text, apiKey, model, {
     onChunk: (chunk: string) => {
       broadcastMessage({
         eventName: EVENTS.LLM_TRANSLATION_STREAM,
