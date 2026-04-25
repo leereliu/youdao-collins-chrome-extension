@@ -42,6 +42,9 @@ jobs:
       - name: Type check
         run: pnpm typecheck
 
+      - name: Build extension
+        run: pnpm build
+
       - name: Package extension
         run: |
           mkdir -p build
