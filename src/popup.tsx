@@ -13,9 +13,14 @@ import "./styles/globals.css"
 
 // ============ Searcher 组件 ============
 
+interface SearchHistoryItem {
+  word: string
+  result: WordResponse
+}
+
 interface SearcherProps {
   onSearch: (word: string) => void
-  history: WordResponse[]
+  history: SearchHistoryItem[]
   onJumpBack: () => void
 }
 
@@ -132,11 +137,6 @@ function Searcher({ onSearch, history, onJumpBack }: SearcherProps) {
 }
 
 // ============ 主 Popup 组件 ============
-
-interface SearchHistoryItem {
-  word: string
-  result: WordResponse
-}
 
 function shouldPush(
   history: SearchHistoryItem[],

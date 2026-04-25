@@ -1,0 +1,76 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and release extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test:run
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Package extension
+        run: pnpm package
+
+      - name: Prepare release metadata
+        id: meta
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          short_sha="${GITHUB_SHA::7}"
+          tag="v${version}-${short_sha}"
+          asset_name="youdao-collins-chrome-extension-${tag}.zip"
+
+          cp build/chrome-mv3-prod.zip "$asset_name"
+
+          {
+            echo "version=${version}"
+            echo "short_sha=${short_sha}"
+            echo "tag=${tag}"
+            echo "asset_name=${asset_name}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.meta.outputs.tag }}
+          body: |
+            自动构建自 main 分支 commit ${{ github.sha }}。
+
+            Extension version: ${{ steps.meta.outputs.version }}
+          files: ${{ steps.meta.outputs.asset_name }}
+          fail_on_unmatched_files: true

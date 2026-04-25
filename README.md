@@ -1,107 +1,94 @@
-# youdao-collins-chrome-extension
+# 有道柯林斯划词翻译扩展
 
-查询英文单词的[柯林斯](https://www.collinsdictionary.com/)释义的 Chrome 扩展应用。支持划词翻译，数据来源于有道词典。接入扇贝生词本，快速记录新单词，方便未来复习。
+查询英文单词的柯林斯释义，支持网页划词翻译、弹窗搜索、长文本翻译和扇贝生词本。数据主要来自有道词典，AI 翻译通过用户自行配置的 OpenRouter API Key 提供。
 
-![intro](https://oyyd.github.io/youdao-collins-chrome-extension/pics/intro.webp)
+本仓库是个人维护分支，基于原项目继续维护。MIT 许可和原版权信息保留在 [LICENSE.md](./LICENSE.md)。
 
 ## ✨ 特性
 
-- 🔍 **柯林斯词典释义** - 提供英文语境帮助更准确地理解单词意思
-- 📝 **智能翻译** - 单词/短语使用有道翻译，长文本自动使用 AI 翻译
-- 🤖 **AI 流式翻译** - 长文本实时逐字显示翻译结果，体验流畅自然
-- 🎯 **划词翻译** - 支持多种模式（划词即翻、按键+划词、双击划词）
+- 🔍 **柯林斯词典释义** - 提供英文语境、释义、例句和词频，帮助更准确地理解单词意思
+- 📝 **智能翻译** - 单词和短语使用有道词典，长文本自动使用有道机翻
+- 🤖 **AI 流式翻译** - 配置 OpenRouter API Key 后，长文本实时逐字显示 AI 翻译结果
+- 🎛️ **自定义 AI 模型** - 支持在设置页填写 OpenRouter 模型名称
+- 🎯 **划词翻译** - 支持多种模式：划词即翻、按键加划词、双击划词和禁用划词
 - 📚 **扇贝生词本** - 快速记录新单词，方便日后复习
+- 🔊 **英美发音切换** - 支持英音和美音两种发音类型
 - ⌨️ **快捷键支持** - `Ctrl+Q` 快速打开搜索弹窗
+- ↩️ **搜索历史回退** - 弹窗内可回到上一个搜索结果
 
 ## 📦 安装
 
 ### Chrome Web Store
 
-去 Chrome Web Store 上[下载](https://chrome.google.com/webstore/detail/mkohdjbfagmlcaclajmadgkojelkbbfj/)
+商店版本发布中。发布完成后会在这里更新安装地址。
+
+### 手动安装
+
+1. 在 Release 页面下载扩展压缩包，或在本地运行 `pnpm package` 生成压缩包。
+2. 解压得到 Chrome 扩展目录。
+3. 打开 `chrome://extensions/`。
+4. 开启右上角的开发者模式。
+5. 选择加载已解压的扩展程序。
+6. 选择解压后的扩展目录。
 
 ### 本地开发安装
 
-1. 克隆仓库并安装依赖：
-
 ```bash
-git clone https://github.com/oyyd/youdao-collins-chrome-extension.git
+git clone https://github.com/silence/youdao-collins-chrome-extension.git
 cd youdao-collins-chrome-extension
 pnpm install
-```
-
-2. 启动开发服务器：
-
-```bash
 pnpm dev
 ```
 
-3. 在 Chrome 浏览器中加载扩展：
-   - 打开 `chrome://extensions/`
-   - 开启右上角「开发者模式」
-   - 点击「加载已解压的扩展程序」
-   - 选择项目目录下的 `build/chrome-mv3-dev` 文件夹
-
-4. 开发时修改代码会自动热重载，刷新页面即可看到更新
-
-### 构建生产版本
-
-```bash
-pnpm build
-```
-
-构建产物位于 `build/chrome-mv3-prod` 目录。
-
-### 打包发布
-
-```bash
-pnpm package
-```
-
-打包后的 `.zip` 文件位于 `build/` 目录，可直接上传到 Chrome Web Store。
+在 Chrome 扩展管理页加载 `build/chrome-mv3-dev` 目录。开发服务运行期间，页面刷新后即可看到最新效果。
 
 ## 🚀 使用说明
 
-### 智能翻译
+### 单词和短语
 
-扩展会自动判断选中文本的类型：
+选中英文单词或短语后，扩展会查询有道词典页面并解析柯林斯内容。弹窗和网页浮层使用同一套结果展示。
 
-- **单词/短语** (1-3个单词且不超过50字符) - 使用有道词典，显示柯林斯释义
-- **长文本** (超过3个单词或50字符) - 使用有道机翻
+### 长文本翻译
 
-### AI 增强翻译 (可选)
+超过 3 个单词或 50 个字符的文本会进入长文本翻译流程。默认使用有道机翻。配置 AI 后，有道翻译和 AI 翻译会同时展示，AI 结果通过流式方式逐步显示。
 
-配置 AI API Key 后，长文本将获得双重翻译：
+### AI 增强翻译
 
-- **有道机翻** - 快速显示基础翻译
-- **AI 流式翻译** - 实时逐字显示更准确的翻译
-- 两种翻译同时展示，可以对比参考
+1. 访问 [OpenRouter Keys](https://openrouter.ai/keys) 获取 API Key。
+2. 打开扩展设置页。
+3. 在 AI 增强翻译区域填写 API Key。
+4. 按需填写模型名称，例如 `xiaomi/mimo-v2-flash:free`。
+5. 保存设置并刷新当前网页。
 
-**配置方法**：
-
-1. 访问 [OpenRouter](https://openrouter.ai/keys) 注册并获取 API Key（免费）
-2. 打开扩展设置页面
-3. 在「AI 增强翻译」中填入 API Key
-4. 保存设置
-
-推荐使用免费模型：`xiaomi/mimo-v2-flash:free`
-
-**不配置也能用**：未配置 API Key 时，所有文本都使用有道翻译。
+未填写 API Key 时，扩展保持有道翻译流程。
 
 ### 划词翻译模式
 
-在配置页面可以设置划词翻译的模式：
+设置页可选择以下模式：
 
-- **划词即翻译** - 选中文本后立即显示翻译
-- **按住(meta/ctrl)键 + 划词** - 按住修饰键时选中文本才翻译
-- **双击划词翻译** - 双击单词时翻译
+- 划词即翻译：选中文本后显示翻译浮层
+- 按住 meta 或 ctrl 后划词：按下修饰键时选中文本才触发翻译
+- 双击单词后翻译：双击英文单词后触发翻译
+- 禁用划词翻译：保留弹窗搜索，网页划词功能关闭
+
+弹窗右侧的状态按钮可临时关闭或恢复划词翻译。
 
 ### 快捷键
 
-- `Ctrl+Q` (Mac: `MacCtrl+Q`) - 打开右上角弹窗搜索单词
+- Windows 和 Linux：`Ctrl+Q`
+- macOS：`Control+Q`
+
+快捷键会打开扩展弹窗，便于直接输入单词或文本。
 
 ### 扇贝生词本
 
-搜索成功的单词可以快速加入扇贝生词本（需要扇贝账号），方便日后复习学习。
+搜索结果中的生词本按钮会调用扇贝接口。首次使用需要登录扇贝账号。设置页提供清除扇贝登录信息的入口。
+
+## 🔐 隐私和数据
+
+扩展会在 `chrome.storage.sync` 中保存设置项、OpenRouter API Key、扇贝登录状态和本地单词记录。翻译时，选中文本会发送到有道词典。启用 AI 增强翻译后，长文本会发送到 OpenRouter。使用扇贝生词本时，单词会发送到扇贝服务。
+
+扩展不包含开发者自建的分析、广告或追踪服务。
 
 ## 🛠️ 技术栈
 
@@ -111,17 +98,23 @@ pnpm package
 - **Testing**: [Vitest](https://vitest.dev/)
 - **Manifest**: Chrome Extension Manifest V3
 
+## 🧰 开发环境
+
+- Node.js 18 或更新版本
+- pnpm
+- Chrome 或 Chromium 浏览器
+
 ## 📁 项目结构
 
-```
+```text
 src/
-├── background.ts          # Service Worker (后台脚本)
+├── background.ts          # Service Worker 后台脚本
 ├── popup.tsx              # 弹窗页面
 ├── options.tsx            # 配置页面
 ├── contents/
 │   └── plasmo-overlay.tsx # 划词翻译内容脚本
 ├── components/            # React 组件
-│   └── WordDetail.tsx     # 单词详情（共用组件）
+│   └── WordDetail.tsx     # 单词详情共用组件
 ├── lib/                   # 工具库
 │   ├── message.ts         # 消息通信
 │   ├── parser.ts          # 有道页面解析器
@@ -138,7 +131,7 @@ src/
 ## 🧪 测试
 
 ```bash
-# 运行测试（监听模式）
+# 运行测试
 pnpm test
 
 # 运行一次测试
@@ -150,23 +143,44 @@ pnpm typecheck
 
 ## 📝 开发命令
 
-| 命令             | 说明                |
-| ---------------- | ------------------- |
-| `pnpm dev`       | 启动开发服务器      |
-| `pnpm build`     | 构建生产版本        |
-| `pnpm package`   | 打包 zip 文件       |
-| `pnpm test`      | 运行测试            |
-| `pnpm test:run`  | 运行一次测试        |
+| 命令 | 说明 |
+| --- | --- |
+| `pnpm dev` | 启动 Plasmo 开发服务 |
+| `pnpm build` | 构建生产版本 |
+| `pnpm package` | 生成 Chrome Web Store 可上传的 zip |
+| `pnpm test` | 运行 Vitest 监听模式 |
+| `pnpm test:run` | 运行一次测试 |
 | `pnpm typecheck` | TypeScript 类型检查 |
-| `pnpm lint`      | ESLint 代码检查     |
+| `pnpm lint` | ESLint 检查 |
+
+## 🚢 构建和发布
+
+```bash
+pnpm install
+pnpm test:run
+pnpm typecheck
+pnpm build
+pnpm package
+```
+
+`pnpm package` 会在 `build/` 目录生成 zip 文件，可上传到 Chrome Web Store。
+
+发布前建议完成以下检查：
+
+- `package.json` 中的版本号、名称和简介已更新。
+- `pnpm test:run`、`pnpm typecheck`、`pnpm build` 均通过。
+- 在 `chrome://extensions/` 加载 `build/chrome-mv3-prod` 并验证核心流程。
+- 商店说明覆盖权限用途和数据流向。
+- 反馈入口指向当前维护仓库。
 
 ## 🔧 已知问题
 
-- 对 iframe 中的内容不生效
+- 对 iframe 中的内容暂不生效。
+- 有道词典页面结构变化时，释义解析可能需要同步维护。
 
 ## 💬 意见反馈
 
-[issues](https://github.com/oyyd/youdao-collins-chrome-extension/issues)
+问题反馈请提交到 [GitHub Issues](https://github.com/silence/youdao-collins-chrome-extension/issues)。
 
 ## 📄 License
 

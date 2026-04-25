@@ -208,6 +208,7 @@ function TranslatorOverlay() {
     // 立即更新 currentWord 和清空 result，避免显示旧内容
     setCurrentWord(word)
     setResult(null)
+    setLoading(true)
     setLoadingWord(word)
 
     try {
@@ -227,6 +228,7 @@ function TranslatorOverlay() {
       }
     } finally {
       if (word === lastWordRef.current) {
+        setLoading(false)
         setLoadingWord(null) // 清除加载状态
       }
     }

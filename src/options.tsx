@@ -221,10 +221,9 @@ function OptionsApp() {
 
       <p className="mt-4 text-xs text-gray-500">保存后重新刷新页面生效</p>
 
-      {/* 反馈链接 */}
       <div className="mt-6 text-right">
         <a
-          href="https://github.com/oyyd/youdao-collins-chrome-extension/issues"
+          href="https://github.com/silence/youdao-collins-chrome-extension/issues"
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm text-blue-600 hover:underline"
