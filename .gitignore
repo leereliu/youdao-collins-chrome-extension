@@ -34,7 +34,6 @@ coverage/
 npm-debug.log*
 
 # Package managers
-pnpm-lock.yaml
 yarn.lock
 package-lock.json
 
