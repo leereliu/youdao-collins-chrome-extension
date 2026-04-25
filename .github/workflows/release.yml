@@ -43,7 +43,9 @@ jobs:
         run: pnpm typecheck
 
       - name: Package extension
-        run: pnpm package
+        run: |
+          mkdir -p build
+          pnpm package
 
       - name: Prepare release metadata
         id: meta
