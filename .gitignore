@@ -42,5 +42,6 @@ package-lock.json
 *.crx
 *.pem
 !build.pem
+store-assets/
 
 tsconfig.tsbuildinfo
