@@ -20,7 +20,9 @@
 
 ### Chrome Web Store
 
-商店版本发布中。发布完成后会在这里更新安装地址。
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/eocgcjcjclpgaafiaoohjmejnbiccekf?label=Chrome%20Web%20Store)](https://chromewebstore.google.com/detail/eocgcjcjclpgaafiaoohjmejnbiccekf)
+
+[划词翻译柯林斯词典 + 扇贝生词本](https://chromewebstore.google.com/detail/eocgcjcjclpgaafiaoohjmejnbiccekf) — 在 Chrome 扩展管理页点击「添加至 Chrome」即可安装。
 
 ### 手动安装
 
